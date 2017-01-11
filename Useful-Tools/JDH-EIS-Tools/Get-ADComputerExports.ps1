@@ -9,6 +9,9 @@
 #	11/1/2016	131224320000000000
 #	12/1/2016	131250240000000000
 #
+
+$now = Get-Date
+
 #XRXROOT
 $DomainName = "xerox.net"
 $Domain = Get-ADDomain $DomainName
@@ -33,7 +36,7 @@ $Domain = Get-ADDomain $DomainName
 $PDC = $Domain.PDCEmulator 
 Get-ADComputer -Server $PDC -Properties cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl -LdapFilter "(&(pwdLastSet>=131143565000000000)(operatingSystem=Windows*Server*))" | select cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl | Export-Csv -NoTypeInformation -Path "P:\SAM\$DomainName.csv" -Encoding Unicode 
 
-$userCred = get-credential
+$userCred = get-credential -Message "XDE User Logon"
 #XDEROOT
 $DomainName = "xerox.org"
 $Domain = Get-ADDomain $DomainName -Credential $userCred
@@ -104,6 +107,6 @@ Get-ADComputer -Server $PDC -Properties cn,sAMAccountName,pwdLastSet,lastLogonTi
 Compress-Archive -Path P:\SAM\*.csv -DestinationPath P:\SAM\XTDomains.zip
 
 #Mail the Zip file
-#Send-MailMessage -To james.herrmann@xerox.com -From XeroxAuthenticationServices@xerox.com -Subject "XT Domain Exports" -Body "Please see the attached." -SmtpServer forwarder.mail.xerox.com -Attachments XTDomains20160928.zip
+Send-MailMessage -To james.herrmann@xerox.com -From XeroxAuthenticationServices@xerox.com -Subject "XT Domain Exports - $now" -Body "Please see the attached reports generated $now." -SmtpServer forwarder.mail.xerox.com -Attachments p:\sam\XTDomains.zip
 
-Get-ADComputer -Server $PDC -Properties cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl -LdapFilter "(&(pwdLastSet>=131143565000000000)(operatingSystem=*Server*))" | select cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl | Export-Csv -NoTypeInformation -Path "P:\SAM\$DomainName.csv" -Encoding Unicode 
+#Get-ADComputer -Server $PDC -Properties cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl -LdapFilter "(&(pwdLastSet>=131143565000000000)(operatingSystem=*Server*))" | select cn,sAMAccountName,pwdLastSet,lastLogonTimestamp,dNSHostName,operatingSystem,operatingSystemServicePack,operatingSystemVersion,userAccountControl | Export-Csv -NoTypeInformation -Path "P:\SAM\$DomainName.csv" -Encoding Unicode 
